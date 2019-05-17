@@ -12,16 +12,20 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AspNetCoreRestfulApi.Helpers;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetCoreRestfulApi
 {
     public class Startup
     {
         public static IConfiguration Configuration;
+        private readonly ILogger<Startup> _logger;
 
-        public Startup(IConfiguration configuration)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
+            _logger = logger;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -48,6 +52,7 @@ namespace AspNetCoreRestfulApi
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env, LibraryContext libraryContext)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -58,6 +63,14 @@ namespace AspNetCoreRestfulApi
                 {
                     appBuilder.Run(async context =>
                     {
+                        var exceptionHandlerFeature = context.Features.Get<IExceptionHandlerFeature>();
+                        if (exceptionHandlerFeature != null)
+                        {
+                            _logger.LogError(500,
+                                exceptionHandlerFeature.Error,
+                                exceptionHandlerFeature.Error.Message);
+                        }
+
                         context.Response.StatusCode = 500;
                         await context.Response.WriteAsync("An unexpected fault happened. Try again later.");
 

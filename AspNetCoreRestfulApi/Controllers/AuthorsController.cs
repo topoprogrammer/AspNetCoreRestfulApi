@@ -9,6 +9,7 @@ using AspNetCoreRestfulApi.Helpers;
 using AutoMapper;
 using AspNetCoreRestfulApi.Entities;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace AspNetCoreRestfulApi.Controllers
 {
@@ -16,15 +17,20 @@ namespace AspNetCoreRestfulApi.Controllers
     public class AuthorsController : Controller
     {
         private ILibraryRepository _libraryRepository;
+        private ILogger<BooksController> _logger;
 
-        public AuthorsController(ILibraryRepository libraryRepository)
+        public AuthorsController(ILibraryRepository libraryRepository, ILogger<BooksController> logger)
         {
+            _logger = logger;
             _libraryRepository = libraryRepository;
         }
 
         [HttpGet()]
         public IActionResult GetAuthors()
-        { 
+        {
+
+            _logger.LogInformation(100, $"Testing Logger");
+
             var authorsFromRepo = _libraryRepository.GetAuthors();
 
             var authors = Mapper.Map<IEnumerable<AuthorDto>>(authorsFromRepo);
