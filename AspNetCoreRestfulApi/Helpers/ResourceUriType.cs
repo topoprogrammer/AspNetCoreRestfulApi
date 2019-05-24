@@ -9,6 +9,7 @@ namespace AspNetCoreRestfulApi.Helpers
     public enum ResourceUriType
     {
         PreviousPage,
-        NextPage
+        NextPage,
+        Current
     }
 }
